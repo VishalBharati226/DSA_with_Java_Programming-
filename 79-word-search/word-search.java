@@ -1,48 +1,35 @@
 class Solution {
-    private int rows;
-    private int cols;
-    private Set<String> visited;
-
     public boolean exist(char[][] board, String word) {
-        rows = board.length;
-        cols = board[0].length;
-        visited = new HashSet<>();
+        int row = board.length;
+        int col = board[0].length;
 
-        Map<Character, Integer> count = new HashMap<>();
-        for (char c : word.toCharArray()) {
-            count.put(c, count.getOrDefault(c, 0) + 1);
-        }
-
-        if (count.getOrDefault(word.charAt(0), 0) > count.getOrDefault(word.charAt(word.length() - 1), 0)) {
-            word = new StringBuilder(word).reverse().toString();
-        }
-
-        for (int r = 0; r < rows; r++) {
-            for (int c = 0; c < cols; c++) {
-                if (dfs(board, word, r, c, 0)) {
-                    return true;
-                }
+        for(int i=0; i<row; i++){
+            for(int j=0; j<col; j++){
+                if(dfs(board, word, i, j, 0)) return true;
             }
         }
 
         return false;
     }
 
-    private boolean dfs(char[][] board, String word, int r, int c, int k) {
-        if (k == word.length()) {
-            return true;
-        }
+    private boolean dfs(char[][] board, String word, int row, int col, int idx){
+        if(idx == word.length()) return true;
 
-        if (r < 0 || r >= rows || c < 0 || c >= cols || visited.contains(r + "," + c) || board[r][c] != word.charAt(k)) {
+        if(row<0 || col<0 || row>=board.length || col>=board[0].length || board[row][col] != word.charAt(idx)){
             return false;
         }
 
-        visited.add(r + "," + c);
-        boolean res = dfs(board, word, r + 1, c, k + 1) ||
-                      dfs(board, word, r - 1, c, k + 1) ||
-                      dfs(board, word, r, c + 1, k + 1) ||
-                      dfs(board, word, r, c - 1, k + 1);
-        visited.remove(r + "," + c);
-        return res;
-    }    
+        char temp = board[row][col];
+        board[row][col] = '#';
+
+        boolean found = 
+            dfs(board,word,row+1,col,idx+1) ||
+            dfs(board,word,row-1,col,idx+1) ||
+            dfs(board,word,row,col+1,idx+1) ||
+            dfs(board,word,row,col-1,idx+1);
+
+        board[row][col] = temp;
+
+        return found;
+    }
 }
